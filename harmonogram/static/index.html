@@ -1,0 +1,119 @@
+<!doctype html>
+<html lang="cs">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Harmonogram legislativního procesu</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header class="topbar">
+    <div class="title">
+      <h1>Harmonogram legislativního procesu</h1>
+      <p class="subtitle">Lhůty se počítají právnicky: den události se nezapočítává, úkony jen v pracovní dny.</p>
+    </div>
+    <div class="actions no-print">
+      <button id="btn-docx" type="button">Export Word</button>
+      <button id="btn-csv" type="button">Export CSV</button>
+      <button id="btn-save" type="button" title="Uloží všechny varianty do jednoho souboru">Uložit</button>
+      <label class="button" for="file-load" title="Načte uložený harmonogram se všemi variantami">Načíst</label>
+      <input id="file-load" type="file" accept=".json,application/json" hidden>
+      <button id="btn-print" type="button">Tisk</button>
+      <button id="btn-reset" type="button" class="ghost" title="Smaže všechny varianty a začne načisto">Nový harmonogram</button>
+    </div>
+  </header>
+
+  <section class="variants no-print" aria-label="Varianty harmonogramu">
+    <span class="variants-label">Varianty:</span>
+    <div id="variant-tabs" class="variant-tabs"></div>
+    <button id="btn-variant-new" type="button" class="ghost" title="Nová varianta jako kopie aktuální">+ Nová varianta</button>
+    <label class="variant-name-field">Název <input id="variant-name" type="text" maxlength="120"></label>
+    <button id="btn-variant-delete" type="button" class="ghost danger">Smazat variantu</button>
+  </section>
+
+  <section class="settings">
+    <div class="field wide">
+      <label for="doc-title">Název návrhu (do Wordu)</label>
+      <input id="doc-title" type="text" placeholder="Návrh zákona o …">
+    </div>
+    <div class="field">
+      <label for="doc-effective">Účinnost (do Wordu)</label>
+      <input id="doc-effective" type="text" placeholder="např. 1. ledna 2028">
+    </div>
+    <div class="field">
+      <label for="first-phase">První krok harmonogramu</label>
+      <select id="first-phase"></select>
+    </div>
+    <div class="field">
+      <label for="start-date">Datum prvního kroku</label>
+      <input id="start-date" type="date">
+    </div>
+    <div id="weekday-fields" class="weekday-fields"></div>
+    <label class="check">
+      <input id="shift-end" type="checkbox">
+      <span>Konec lhůty připadající na víkend či svátek posunout na další pracovní den</span>
+    </label>
+  </section>
+
+  <section class="parliament no-print">
+    <div class="parliament-head">
+      <div>
+        <h2>Harmonogramy PSP a Senátu</h2>
+        <div id="parl-status" class="parl-status"></div>
+      </div>
+      <div class="parl-actions">
+        <label class="check"><input id="use-parl" type="checkbox"> <span>Respektovat týdny zasedání</span></label>
+        <label class="check"><input id="psp-variable" type="checkbox"> <span>Schůze PSP i ve variabilních týdnech</span></label>
+        <button id="btn-parl-refresh" type="button">Aktualizovat z psp.cz a senat.cz</button>
+        <select id="parl-import-chamber" aria-label="Komora pro načtení stránky">
+          <option value="psp">PSP</option>
+          <option value="senat">Senát</option>
+        </select>
+        <label class="button ghost-label" for="parl-import">Načíst uloženou stránku…</label>
+        <input id="parl-import" type="file" accept=".html,.htm,text/html" hidden>
+      </div>
+    </div>
+    <details id="parl-weeks-box">
+      <summary>Týdny v období harmonogramu (lze ručně opravit)</summary>
+      <div class="weeks-legend">
+        <span class="sw wt-plenary">řádná / plenární schůze</span>
+        <span class="sw wt-extra">mimořádná schůze</span>
+        <span class="sw wt-variable">variabilní týden</span>
+        <span class="sw wt-other">žádná schůze</span>
+        <span class="sw wt-unknown">neuvedeno</span>
+        <span class="sw manual">✎ ručně nastaveno</span>
+      </div>
+      <table class="weeks">
+        <thead><tr><th>Týden</th><th>Poslanecká sněmovna</th><th>Senát</th><th>Fáze v týdnu</th></tr></thead>
+        <tbody id="parl-weeks"></tbody>
+      </table>
+    </details>
+  </section>
+
+  <section class="summary" id="summary"></section>
+
+  <main>
+    <table class="schedule">
+      <thead>
+        <tr>
+          <th class="num">#</th>
+          <th>Fáze</th>
+          <th>Lhůta</th>
+          <th>Datum</th>
+          <th class="no-print">Vlastní datum</th>
+          <th>Stav a zdůvodnění</th>
+        </tr>
+      </thead>
+      <tbody id="rows"></tbody>
+    </table>
+  </main>
+
+  <details class="holidays no-print">
+    <summary>Svátky v období harmonogramu</summary>
+    <ul id="holiday-list"></ul>
+  </details>
+
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+  <script src="app.js"></script>
+</body>
+</html>
